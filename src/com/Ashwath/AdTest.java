@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
+import com.test.db.JokesDatabaseHelper;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -33,8 +34,10 @@ public class AdTest extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         
 		//test
-		super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+		super.onCreate(savedInstanceState);        
+		dbHelper= new JokesDatabaseHelper(this);
+        dbHelper.open();
+		setContentView(R.layout.main);
         
         initializeInsults();
         initializeAd();
