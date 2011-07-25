@@ -35,7 +35,7 @@ public class AdTest extends Activity {
         
 		//test
 		super.onCreate(savedInstanceState);        
-		dbHelper= new JokesDatabaseHelper(this);
+		JokesDatabaseHelper dbHelper = new JokesDatabaseHelper(this);
         dbHelper.open();
 		setContentView(R.layout.main);
         
