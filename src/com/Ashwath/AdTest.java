@@ -16,32 +16,29 @@ import android.widget.TextView;
 
 public class AdTest extends Activity {
     private static final String MY_AD_UNIT_ID = "a14e25e167bba07";
-
-    private static ArrayList<String> listOfInsults = new ArrayList<String>();
     
-    private void initializeInsults() 
-    {
-    	listOfInsults.add("Your mama's so fat");
-    	listOfInsults.add("You suck a lot");
-    	listOfInsults.add("Loser");
-    	listOfInsults.add("Lame"); 
-    	listOfInsults.add("Timepass");
-    	listOfInsults.add("Hate you!!!");
-    }
+    //connection to DB
+    JokesDatabaseHelper dbHelper = null;
     
+    private static int jokes_count;
+     
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         
-		//test
 		super.onCreate(savedInstanceState);        
-		JokesDatabaseHelper dbHelper = new JokesDatabaseHelper(this);
-        dbHelper.open();
+	    
+		//set the current context to helper class
+		dbHelper = new JokesDatabaseHelper(this);
+		//open the connection and load jokes
+		dbHelper.open();
+		
 		setContentView(R.layout.main);
         
-        initializeInsults();
+		//get the total number of jokes in the database
+		jokes_count= dbHelper.JokesCount();
         initializeAd();
-        displayInsult();
+        displayInsult();        
         
         final Button button = (Button) findViewById(R.id.button3);
         button.setOnClickListener(new View.OnClickListener() {
@@ -53,15 +50,15 @@ public class AdTest extends Activity {
 
     private void displayInsult()
     {
-    	TextView textView = (TextView)findViewById(R.id.serif);
-    	textView.setText(getRandomInsult());
+    	TextView textView = (TextView)findViewById(R.id.serif);    	
+    	textView.setText(dbHelper.fetchJoke(getRandomNumber()));
     }
    
-    private String getRandomInsult()
+    private int getRandomNumber()
     {
     	double rand = Math.random();
-    	int randInt = (int) (rand * listOfInsults.size());
-    	return listOfInsults.get(randInt);
+    	int randInt = (int) (rand * jokes_count);
+    	return randInt;
     }
     
 	private void initializeAd() {
