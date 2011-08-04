@@ -4,12 +4,9 @@ package com.test.db;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.Cursor;
@@ -21,6 +18,10 @@ import android.util.Log;
 
 public class JokesDatabaseHelper {
 
+	public enum Sources{
+		JOKES_DB, INSULTS_DB
+	}
+	
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDb;
 	
@@ -28,10 +29,14 @@ public class JokesDatabaseHelper {
     private static final int DATABASE_VERSION = 2;
     
     private static final String JOKES_TABLE_NAME = "jokes";
+    private static final String INSULTS_TABLE_NAME = "insults";
     
     private static final String COL_JOKEID = "joke_id";
     private static final String COL_CATEGORY = "category";
     private static final String COL_JOKE = "joke";
+    
+    private static final String COL_INSULTID = "insult_id";    
+    private static final String COL_INSULT = "insult";
     
     private static final String JOKES_SOURCE_LOC = "jokes.sql";
     private static final String INSULTS_SOURCE_LOC = "insults.sql";
@@ -39,19 +44,19 @@ public class JokesDatabaseHelper {
 	/**
 	 * Jokes Database creation sql statement
 	 */
-	private static final String DATABASE_CREATE = "CREATE TABLE "+JOKES_TABLE_NAME+" ("+
+	private static final String CREATE_TABLE_JOKES = "CREATE TABLE "+JOKES_TABLE_NAME+" ("+
 				COL_JOKEID+ " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				COL_CATEGORY+ " TEXT ," +
 				COL_JOKE+ " TEXT)";
+	
+	private static final String CREATE_TABLE_INSULTS = "CREATE TABLE "+INSULTS_TABLE_NAME+" ("+
+				COL_INSULTID+ " INTEGER PRIMARY KEY AUTOINCREMENT, " +				
+				COL_INSULT+ " TEXT)";
 
 	private final Context mCtx;
 	
 	private static class DatabaseHelper extends SQLiteOpenHelper {
-
-		enum Sources{
-			JOKES_DB, INSULTS_DB
-		}
-		
+			
 		private final Context mCtx_inner;
 		
 		DatabaseHelper(Context context) {
@@ -62,20 +67,23 @@ public class JokesDatabaseHelper {
 		@Override
 		public void onCreate(SQLiteDatabase db) {
 
-			db.execSQL(DATABASE_CREATE);
+			db.execSQL(CREATE_TABLE_JOKES);
+			db.execSQL(CREATE_TABLE_INSULTS);
 			populateDB(db, Sources.JOKES_DB);
+			populateDB(db, Sources.INSULTS_DB);
 		}
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			db.execSQL("DROP TABLE IF EXISTS "+JOKES_TABLE_NAME);
+			db.execSQL("DROP TABLE IF EXISTS "+INSULTS_TABLE_NAME);
 			onCreate(db);
 		}
 		
 		private void populateDB(SQLiteDatabase db, Sources source){
 			
 			final String SOURCE_LOC = (source==Sources.JOKES_DB)?JOKES_SOURCE_LOC:INSULTS_SOURCE_LOC;		
-			Log.v("Reached****************************","*******************************");
+			Log.v("Loading.."+SOURCE_LOC,"*******************************");
 			
 			AssetManager am = mCtx_inner.getAssets();				
 			try {
@@ -87,7 +95,7 @@ public class JokesDatabaseHelper {
 			    while ((line = br.readLine()) != null) {
 			    	db.execSQL(line);
 			    }
-				Log.v("FInished****************************","*******************************");
+				Log.v("Finished","*******************************");
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -109,15 +117,12 @@ public class JokesDatabaseHelper {
 	public void close() {
 		mDbHelper.close();
 	}
-
-	public Cursor fetchAllJokes() {
-		return null;
-	}
 	
-	public int JokesCount() throws SQLException {
+	public int countRows(Sources source) throws SQLException {
 		
+		final String SOURCE_TABLE = (source==Sources.JOKES_DB)?JOKES_TABLE_NAME:INSULTS_TABLE_NAME;
 		int count = 0;
-		Cursor c = mDb.rawQuery("SELECT COUNT(1)" + " FROM " + JOKES_TABLE_NAME, null);
+		Cursor c = mDb.rawQuery("SELECT COUNT(1)" + " FROM " + SOURCE_TABLE, null);
     
 		if (c != null ) {
 			c.moveToFirst();		          
@@ -126,15 +131,21 @@ public class JokesDatabaseHelper {
 		return count;
 	}
 
-	public String fetchJoke(int random_id) throws SQLException {
-		String joke = null;
-		Cursor c = mDb.rawQuery("SELECT " + COL_JOKE + " FROM " +
-                JOKES_TABLE_NAME +" where "+ COL_JOKEID +"="+random_id, null);
+	public String fetchJokeorInsult(int random_id, Sources source) throws SQLException {
+		
+		final String SOURCE_TABLE = (source==Sources.JOKES_DB)?JOKES_TABLE_NAME:INSULTS_TABLE_NAME;
+		final String SELECT_COLUMN = (source==Sources.JOKES_DB)?COL_JOKE:COL_INSULT;
+		final String WHERE_COLUMN = (source==Sources.JOKES_DB)?COL_JOKEID:COL_INSULTID;
+		
+		String result = null;
+		
+		Cursor c = mDb.rawQuery("SELECT " + SELECT_COLUMN + " FROM " +
+				SOURCE_TABLE +" where "+ WHERE_COLUMN +"="+random_id, null);
     
 		if (c != null ) {
 			c.moveToFirst();		          
-			joke = c.getString(c.getColumnIndex(COL_JOKE));         
+			result = c.getString(c.getColumnIndex(SELECT_COLUMN));         
 		}
-		return joke;
+		return result;
 	}
 }

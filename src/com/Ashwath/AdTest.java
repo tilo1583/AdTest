@@ -1,11 +1,10 @@
 package com.Ashwath;
 
-import java.util.ArrayList;
-
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
 import com.test.db.JokesDatabaseHelper;
+import com.test.db.JokesDatabaseHelper.Sources;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -21,6 +20,7 @@ public class AdTest extends Activity {
     JokesDatabaseHelper dbHelper = null;
     
     private static int jokes_count;
+    private static int insults_count;
      
 	/** Called when the activity is first created. */
     @Override
@@ -35,29 +35,37 @@ public class AdTest extends Activity {
 		
 		setContentView(R.layout.main);
         
-		//get the total number of jokes in the database
-		jokes_count= dbHelper.JokesCount();
+		//get the total number of jokes/insults in the database
+		jokes_count= dbHelper.countRows(Sources.JOKES_DB);
+		insults_count= dbHelper.countRows(Sources.INSULTS_DB);
         initializeAd();
-        displayInsult();        
+        displayJokeorInsult(Sources.JOKES_DB);        
         
-        final Button button = (Button) findViewById(R.id.button3);
-        button.setOnClickListener(new View.OnClickListener() {
+        final Button button1 = (Button) findViewById(R.id.button3);
+        button1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-               displayInsult();
+            	displayJokeorInsult(Sources.JOKES_DB);               
+            }
+        });
+        
+        final Button button2 = (Button) findViewById(R.id.button4);
+        button2.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	displayJokeorInsult(Sources.INSULTS_DB);               
             }
         });
     }
 
-    private void displayInsult()
+    private void displayJokeorInsult(Sources source)
     {
-    	TextView textView = (TextView)findViewById(R.id.serif);    	
-    	textView.setText(dbHelper.fetchJoke(getRandomNumber()));
+    	TextView textView = (TextView)findViewById(R.id.serif);    	    	
+    	textView.setText(dbHelper.fetchJokeorInsult(getRandomNumber(source),source));
     }
    
-    private int getRandomNumber()
+    private int getRandomNumber(Sources source)
     {
     	double rand = Math.random();
-    	int randInt = (int) (rand * jokes_count);
+    	int randInt = (int) (rand * ((source==Sources.JOKES_DB)?jokes_count:insults_count));
     	return randInt;
     }
     
@@ -71,5 +79,5 @@ public class AdTest extends Activity {
         // Initiate a generic request to load it with an ad
      		
         adView.loadAd(new AdRequest());
-	}
+	}	
 }
