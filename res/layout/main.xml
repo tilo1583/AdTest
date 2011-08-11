@@ -4,21 +4,31 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="#ffffff"
     >
 <TextView android:id="@+id/serif"
  android:text="Serif"
  android:layout_width="wrap_content"
  android:layout_height="wrap_content"
  android:typeface="serif"
+ android:textColor="#616D7E"
+ android:background="@drawable/devil"
 />    
-<Button android:id ="@+id/button3"
- android:text="Wanna Laugh More"
- android:layout_height="wrap_content"
+<LinearLayout
+ android:orientation="horizontal"
  android:layout_width="wrap_content"
-/>
+ android:layout_height="wrap_content"
+ android:background="#ffffff"
+ >
 <Button android:id ="@+id/button4"
- android:text="Insult Me More"
+ android:text="Insult Mode!"
  android:layout_height="wrap_content"
  android:layout_width="wrap_content"
 />
+<Button android:id ="@+id/button3"
+ android:text="Joke Mode!"
+ android:layout_height="wrap_content"
+ android:layout_width="wrap_content"
+/>
+</LinearLayout>
 </LinearLayout>
