@@ -1,7 +1,5 @@
 package com.Ashwath;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
@@ -60,15 +58,14 @@ public class AdTest extends Activity {
 
     private void displayJokeorInsult(Sources source)
     {
+    	String displayText = dbHelper.fetchJokeorInsult(getRandomNumber(source),source);
     	TextView textView = (TextView)findViewById(R.id.serif);    	    	
-    	textView.setText(massageDataWithNewLineChars(dbHelper.fetchJokeorInsult(getRandomNumber(source),source)));
+    	textView.setText(massageDataWithNewLineChars(displayText));
     }
    
     public static String massageDataWithNewLineChars(String data)
-	{
-		data = data.replaceAll("\\\\r","");
-		data = data.replaceAll("\\\\n","\n");
-				
+	{		
+		data = data.replaceAll("\\\\n","\n");			
 		return data;
 	}
     
