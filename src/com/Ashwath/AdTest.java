@@ -1,5 +1,6 @@
 package com.Ashwath;
 
+import java.util.regex.*;
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
@@ -8,6 +9,11 @@ import com.test.db.JokesDatabaseHelper.Sources;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.method.MovementMethod;
+import android.text.method.ScrollingMovementMethod;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -59,14 +65,28 @@ public class AdTest extends Activity {
     private void displayJokeorInsult(Sources source)
     {
     	String displayText = dbHelper.fetchJokeorInsult(getRandomNumber(source),source);
-    	TextView textView = (TextView)findViewById(R.id.serif);    	    	
+    	//String displayText = dbHelper.fetchJokeorInsult(40 ,source);
+    	TextView textView = (TextView)findViewById(R.id.serif);
+    	textView.scrollTo(0, 0);
+    	textView.setMovementMethod(new ScrollingMovementMethod());
     	textView.setText(massageDataWithNewLineChars(displayText));
     }
    
     public static String massageDataWithNewLineChars(String data)
-	{		
-		data = data.replaceAll("\\\\n","\n");			
-		return data;
+	{	
+    	// The db has '\n' characters. When retrieving from the db, the getString
+    	// thinks that it needs to retain the '\' and so adds an additional escape 
+    	// char to it, thus making it '\\n'. So we have *two* '\' to escape when
+    	// parsing the string in the code here.
+		data = data.replaceAll("\\\\n"," ");	
+		// Below logic found online at 
+		// http://www.exampledepot.com/egs/java.util.regex/RemDupSpace.html
+        String patternStr = "\\s+";
+        String replaceStr = " ";
+        Pattern pattern = Pattern.compile(patternStr);
+        Matcher matcher = pattern.matcher(data);
+        data = matcher.replaceAll(replaceStr);
+        return data;
 	}
     
     private int getRandomNumber(Sources source)
