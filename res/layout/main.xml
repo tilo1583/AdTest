@@ -5,29 +5,33 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#ffffff"
-    >
+    android:weightSum="1">
 <TextView android:id="@+id/serif"
  android:text="Serif"
- android:layout_width="wrap_content"
- android:layout_height="wrap_content"
+ android:layout_height="0dp"
  android:typeface="serif"
- android:textColor="#616D7E"
- android:background="@drawable/devil"
-/>    
+ android:background="@drawable/joker_fade"
+ android:layout_weight="0.90" 
+ android:textColor="#000000"
+ android:textAppearance="@style/JokeInsultFont"
+ android:scrollbars="vertical" android:scrollbarFadeDuration="500" android:layout_width="match_parent" 
+ android:padding="20px" 
+ android:gravity="fill|center_vertical" android:fadeScrollbars="true" android:scrollbarDefaultDelayBeforeFade="500" android:scrollbarSize="5px" android:shadowColor="#0F0F0F"/>    
 <LinearLayout
  android:orientation="horizontal"
  android:layout_width="wrap_content"
- android:layout_height="wrap_content"
+ android:layout_height="0dp"
  android:background="#ffffff"
- >
+ android:layout_weight="0.10"
+ android:layout_gravity="center">
 <Button android:id ="@+id/button4"
- android:text="Insult Mode!"
- android:layout_height="wrap_content"
+ android:text="Next Insult..."
+ android:layout_height="fill_parent"
  android:layout_width="wrap_content"
-/>
+ />
 <Button android:id ="@+id/button3"
- android:text="Joke Mode!"
- android:layout_height="wrap_content"
+ android:text="Next Joke..."
+ android:layout_height="fill_parent"
  android:layout_width="wrap_content"
 />
 </LinearLayout>
