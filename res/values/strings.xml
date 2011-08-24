@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello World, AdTest!</string>
-    <string name="app_name">AdTest</string>
+    <string name="app_name">Rude Joker</string>
+    <string name="activity_name">Rude Joker!</string>
+    <string name="mode_prompt">What do you want?</string>
+    <string-array name="mode_array">
+        <item>Joke</item>
+        <item>Insult</item>
+    </string-array>
 </resources>
