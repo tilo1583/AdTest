@@ -175,6 +175,7 @@ public class AdTest extends Activity {
 	      	 facebook.authorize(this, new String[]{"publish_stream"}, new DialogListener() {
 	             @Override
 	             public void onComplete(Bundle values) {
+	            	 // Not sure yet if token is useful or not, but seems to work without
 	            	 //facebook.setAccessToken(values.getString(Facebook.TOKEN));
 	            	 updateStatus(values.getString(Facebook.TOKEN));
 	            	 Log.d("onComplete","");
@@ -208,7 +209,6 @@ public class AdTest extends Activity {
     	//try 
     	{
 			Bundle bundle = new Bundle();
-			//bundle.putString("method", "auth.expireSession"); 
 			//'message' tells facebook that you're updating your status
 			bundle.putString("message", displayText); 
 			//bundle.putString(Facebook.TOKEN,accessToken);
@@ -217,6 +217,8 @@ public class AdTest extends Activity {
 			//String response = facebook.request("me/feed",bundle,"POST");
 			//Toast.makeText(AdTest.this, "Posting to Your Wall...", Toast.LENGTH_SHORT).show();
 			//Log.d("UPDATE RESPONSE",""+response);
+			
+			// From June/July 2011, FB ignores 'message' and so we had to publish via link + caption + name
 			bundle.putString("link", "http://www.facebook.com/apps/application.php?id=273107596035037");
 			bundle.putString("name", "Rude Joker!");
 			bundle.putString("caption", displayText);
@@ -225,7 +227,8 @@ public class AdTest extends Activity {
 	        	      new DialogListener() {
 	        	           @Override
 	        	           public void onComplete(Bundle values) {
-	        	        	   final String postId = values.getString ("post_id"); 
+	        	        	   final String postId = values.getString ("post_id");
+	        	        	   // Raise a toast only on publishing
 	        	        	   if (postId != null) 
 	        	        	   { 
 	        	        		   Toast.makeText(AdTest.this, "Posting on your wall...", Toast.LENGTH_SHORT).show();

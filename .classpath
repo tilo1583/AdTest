@@ -4,5 +4,6 @@
 	<classpathentry exported="true" kind="lib" path="Externals/GoogleAdMobAdsSdk.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="src" path="com_facebook_android_src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

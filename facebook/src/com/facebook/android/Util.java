@@ -93,6 +93,8 @@ public final class Util {
             String array[] = s.split("&");
             for (String parameter : array) {
                 String v[] = parameter.split("=");
+                // Fix for FB Bug from 
+                // https://github.com/wrapp/facebook-android-sdk/commit/f226c110ff49b75b8a15d486a74e0295e05b8bd5
                 if(v.length == 2) {
                 	params.putString(URLDecoder.decode(v[0]),
                                  URLDecoder.decode(v[1]));
