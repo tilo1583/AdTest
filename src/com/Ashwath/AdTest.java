@@ -225,7 +225,11 @@ public class AdTest extends Activity {
 	        	      new DialogListener() {
 	        	           @Override
 	        	           public void onComplete(Bundle values) {
-	        	        	   Toast.makeText(AdTest.this, "Posting to Your Wall...", Toast.LENGTH_SHORT).show();
+	        	        	   final String postId = values.getString ("post_id"); 
+	        	        	   if (postId != null) 
+	        	        	   { 
+	        	        		   Toast.makeText(AdTest.this, "Posting on your wall...", Toast.LENGTH_SHORT).show();
+	        	        	   }
 	        	               Log.d("onComplete","");
 	        	           }
 
