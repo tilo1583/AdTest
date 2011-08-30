@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.Ashwath"
-      android:versionCode="1"
-      android:versionName="1.0">
-
-
+      android:versionCode="2"
+      android:versionName="1.1">
+    <uses-sdk android:maxSdkVersion="10" android:targetSdkVersion="10" android:minSdkVersion="3"/>
     <application android:icon="@drawable/icon" android:label="@string/app_name">
-        <activity android:name=".AdTest"
+        <activity android:name=".RudeJoker"
                   android:label="@string/activity_name"
                   >
             <intent-filter>
@@ -14,9 +13,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:label="@string/activity_name"
+              android:name=".LaunchDialog">
+    	</activity>
 		<activity android:name="com.google.ads.AdActivity"
 		              android:configChanges="keyboard|keyboardHidden|orientation"/>
     </application>
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
      <uses-permission android:name="android.permission.INTERNET"/>
   	 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 </manifest>
