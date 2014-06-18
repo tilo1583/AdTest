@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -37,19 +38,21 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import com.facebook.android.*;
 import com.facebook.android.Facebook.*;
 
-public class AdTest extends Activity {
+public class RudeJoker extends Activity {
 	Facebook facebook = new Facebook("273107596035037");
 	private static boolean isFBAuthorized = false;
+	private static int prevSeekBarProgress = 0;
 
     private static final String MY_AD_UNIT_ID = "a14e25e167bba07";
     private static final String DISPLAY_TEXT_STR = "DisplayText";
+    private static final String DB_SOURCE_STR = "DBSource";
     
     //connection to DB
     JokesDatabaseHelper dbHelper = null;
     
     private static int jokes_count;
     private static int insults_count;
-    private static Sources db_source;
+    private static Sources db_source = Sources.INSULTS_DB;
     private static String displayText;
     
     public void onSaveInstanceState (Bundle outState)
@@ -58,6 +61,7 @@ public class AdTest extends Activity {
     	 // This bundle will be passed to onCreate if the process is
     	 // killed and restarted.
     	 outState.putString(DISPLAY_TEXT_STR, displayText);
+    	 outState.putString(DB_SOURCE_STR, db_source.name());
     	 // [TODO] save the isFBauthorized as well?
     	 super.onSaveInstanceState(outState);
     }
@@ -77,49 +81,54 @@ public class AdTest extends Activity {
         
 		Configuration config = getResources().getConfiguration();
 	    ImageView img = (ImageView)findViewById(R.id.imageView1);
-		if(config.orientation == Configuration.ORIENTATION_LANDSCAPE)
+    	TextView textView = (TextView)findViewById(R.id.serif);
+    	if(config.orientation == Configuration.ORIENTATION_LANDSCAPE)
 	    {
 			img.setVisibility(ImageView.INVISIBLE);
+			textView.setPadding(5, 5, 5, 5);
 	    }
 		else
 		{
 			img.setVisibility(ImageView.VISIBLE);
+			textView.setPadding(45, 45, 45, 45);
 		}
 
 		//get the total number of jokes/insults in the database
 		jokes_count= dbHelper.countRows(Sources.JOKES_DB);
 		insults_count= dbHelper.countRows(Sources.INSULTS_DB);
-		db_source = Sources.INSULTS_DB;
 
 		if(savedInstanceState == null)
 		{
+			db_source = Sources.INSULTS_DB;
 			displayJokeorInsult(db_source);
 		}
 		else
 		{
+			String src = savedInstanceState.getString(DB_SOURCE_STR);
+			db_source = Sources.valueOf(src);
 			displayText = savedInstanceState.getString(DISPLAY_TEXT_STR);
 			display(displayText);
 		}
         
-        final Button button1 = (Button) findViewById(R.id.nextButton);
-        button1.setOnClickListener(new View.OnClickListener() {
+        final Button nextButton = (Button) findViewById(R.id.nextButton);
+        nextButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	displayJokeorInsult(Sources.JOKES_DB);               
             }
         });
         
-        final Button shareButton = (Button) findViewById(R.id.twitter_button);
+        final ImageButton shareButton = (ImageButton) findViewById(R.id.share_button);
         shareButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	Intent share = new Intent(Intent.ACTION_SEND);
             	share.setType("text/plain");
-            	//share.putExtra(Intent.EXTRA_STREAM, displayText);
-            	share.putExtra(Intent.EXTRA_TEXT, displayText + " via Rude Joker!");
-            	startActivity(Intent.createChooser(share, "Share it!"));               
+            	share.putExtra(Intent.EXTRA_SUBJECT, "From the Rude Joker's Diary...");
+            	share.putExtra(Intent.EXTRA_TEXT, displayText + "\n\n--The Rude Joker!");
+            	startActivity(Intent.createChooser(share, "Share it!"));
             }
         });
         
-        final Button fbButton = (Button) findViewById(R.id.fb_button);
+        final ImageButton fbButton = (ImageButton) findViewById(R.id.fb_button);
         fbButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	authorizeFB();
@@ -128,6 +137,7 @@ public class AdTest extends Activity {
         
         final SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar1);
         seekBar.incrementProgressBy(1);
+        seekBar.setProgress(0);
         seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			
 			public void onStopTrackingTouch(SeekBar seekBar) {
@@ -136,16 +146,24 @@ public class AdTest extends Activity {
 				{
 					seekBar.setProgress(0);
 					db_source = Sources.INSULTS_DB;
+					if(prevSeekBarProgress != 0)
+					{
+						displayJokeorInsult(db_source);
+					}
 				}
 				else
 				{
 					seekBar.setProgress(seekBar.getMax());
 					db_source = Sources.JOKES_DB;
+					if(prevSeekBarProgress != seekBar.getMax())
+					{
+						displayJokeorInsult(db_source);
+					}
 				}
 			}
 			
 			public void onStartTrackingTouch(SeekBar seekBar) {
-				int mid = seekBar.getMax() / 2;
+				/*int mid = seekBar.getMax() / 2;
 				if(seekBar.getProgress() <= mid)
 				{
 					seekBar.setProgress(0);
@@ -155,14 +173,23 @@ public class AdTest extends Activity {
 				{
 					seekBar.setProgress(seekBar.getMax());
 					db_source = Sources.JOKES_DB;
-				}
-				
+				}*/
+				prevSeekBarProgress = seekBar.getProgress();	
 			}
 			
 			public void onProgressChanged(SeekBar seekBar, int progress,
 					boolean fromUser) {
 				// TODO Auto-generated method stub
-				
+				/*if(progress == 0)
+				{
+					db_source = Sources.INSULTS_DB;
+					displayJokeorInsult(db_source);
+				}
+				else if(progress == seekBar.getMax())
+				{
+					db_source = Sources.JOKES_DB;
+					displayJokeorInsult(db_source);
+				}*/				
 			}
 		});
     }
@@ -172,28 +199,28 @@ public class AdTest extends Activity {
 //    	 if(isFBAuthorized == false)
     	 if(!facebook.isSessionValid())
     	 {
-	      	 facebook.authorize(this, new String[]{"publish_stream"}, new DialogListener() {
+	      	 facebook.authorize(this, new String[]{"publish_stream"}, Facebook.FORCE_DIALOG_AUTH, new DialogListener() {
 	             @Override
 	             public void onComplete(Bundle values) {
 	            	 // Not sure yet if token is useful or not, but seems to work without
 	            	 //facebook.setAccessToken(values.getString(Facebook.TOKEN));
 	            	 updateStatus(values.getString(Facebook.TOKEN));
-	            	 Log.d("onComplete","");
+	            	 //Log.d("onComplete","");
 	             }
 	
 	             @Override
 	             public void onFacebookError(FacebookError error) {
-	            	 Log.d("onFBError","");
+	            	 //Log.d("onFBError","");
 	             }
 	
 	             @Override
 	             public void onError(DialogError e) {
-	            	 Log.d("onError","");
+	            	 //Log.d("onError","");
 	             }
 	
 	             @Override
 	             public void onCancel() {
-	            	 Log.d("onCancel","");
+	            	 //Log.d("onCancel","");
 	             }
 	      	 });
 //	      	 isFBAuthorized = true;
@@ -231,28 +258,28 @@ public class AdTest extends Activity {
 	        	        	   // Raise a toast only on publishing
 	        	        	   if (postId != null) 
 	        	        	   { 
-	        	        		   Toast.makeText(AdTest.this, "Posting on your wall...", Toast.LENGTH_SHORT).show();
+	        	        		   Toast.makeText(RudeJoker.this, "Posting on your wall...", Toast.LENGTH_SHORT).show();
 	        	        	   }
-	        	               Log.d("onComplete","");
+	        	               //Log.d("onComplete","");
 	        	           }
 
 	        	           @Override
 	        	           public void onFacebookError(FacebookError error) {
-	        	        	   Log.d("onFBError","");
+	        	        	   //Log.d("onFBError","");
 	        	           }
 
 	        	           @Override
 	        	           public void onError(DialogError e) {
-	        	        	   Log.d("onError","");
+	        	        	   //Log.d("onError","");
 	        	           }
 
 	        	           @Override
 	        	           public void onCancel() {
-	        	        	   Log.d("onCancel","");
+	        	        	   //Log.d("onCancel","");
 	        	           }
 	        	      }
 	        	);
-			Log.d("UPDATE RESPONSE","");			
+			//Log.d("UPDATE RESPONSE","");			
 		} 
     	/*catch (MalformedURLException e) {
 			Log.e("MALFORMED URL",""+e.getMessage());
